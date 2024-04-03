@@ -33,27 +33,34 @@ func (d *DB[K, V]) Delete(k K) {
 	delete(d.m, k)
 }
 
-func (d *DB[K, V]) MoveTo(db *DB[K, V]) {
-	d.mu.RLock()
-	db.mu.Lock()
-	defer d.mu.RUnlock()
-	defer db.mu.Unlock()
-	for k, v := range d.m {
-		db.m[k] = v
+// TransferTo Function is used to Transfer data from Source DB to Destination DB
+// Source -> Locked for the entire duration
+// Destination -> Locked for the function call duration
+func (src *DB[K, V]) TransferTo(dest *DB[K, V]) {
+	src.mu.RLock()
+	dest.mu.Lock()
+	defer src.mu.RUnlock()
+	defer dest.mu.Unlock()
+	for k, v := range src.m {
+		dest.m[k] = v
 	}
-	d.m = make(map[K]V)
+	src.m = make(map[K]V)
 }
 
-func (d *DB[K, V]) CopyTo(db *DB[K, V]) {
-	d.mu.RLock()
-	db.mu.Lock()
-	defer d.mu.RUnlock()
-	defer db.mu.Unlock()
-	for k, v := range d.m {
-		db.m[k] = v
+// CopyTo Function is used to copy data from Source DB to Destination DB
+// Source -> Locked for the entire duration
+// Destination -> Locked for the function call duration
+func (src *DB[K, V]) CopyTo(dest *DB[K, V]) {
+	src.mu.RLock()
+	dest.mu.Lock()
+	defer src.mu.RUnlock()
+	defer dest.mu.Unlock()
+	for k, v := range src.m {
+		dest.m[k] = v
 	}
 }
 
+// Returns the slice of keys present in the Database
 func (d *DB[K, V]) Keys() []K {
 	d.mu.RLock()
 	defer d.mu.RUnlock()
