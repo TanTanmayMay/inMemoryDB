@@ -45,11 +45,11 @@ func main() {
 	db.Delete("key1")
 
 	// Transfer data to another database
-	anotherDB := inmemdb.New[string, string]()
+	anotherDB := inMemoryDB.New[string, string]()
 	db.TransferTo(anotherDB)
 
 	// Copy data to another database
-	copyDB := inmemdb.New[string, string]()
+	copyDB := inMemoryDB.New[string, string]()
 	anotherDB.CopyTo(copyDB)
 
 	// Retrieve keys
